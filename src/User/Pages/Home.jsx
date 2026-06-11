@@ -101,7 +101,10 @@ function Home() {
     <div className="min-h-screen bg-white">
 
       {/* Header */}
-      <Header />
+      <Header
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        wishlist={wishlist} />
 
       {/* Body */}
       <div className="max-w-7xl mx-auto px-8 py-8">
@@ -125,7 +128,9 @@ function Home() {
 
           {/* Sidebar */}
           <div className="w-64">
-            <Sidebar />
+            <Sidebar categories={categories}
+              selectedSubCategory={selectedSubCategory}
+              setSelectedSubCategory={setSelectedSubCategory} />
           </div>
 
           {/* Products */}
