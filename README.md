@@ -1,16 +1,55 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Product Management Application
 
-Currently, two official plugins are available:
+A full-stack Product Management Application built using the MERN Stack.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- User Authentication (Signup/Login)
+- Category Management
+- Sub Category Management
+- Product Management
+- Product Variants
+- Wishlist
+- Search & Filter
+- Pagination
+- Image Upload using Multer
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+**Frontend:** React.js, Tailwind CSS
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**Backend:** Node.js, Express.js, MongoDB, Mongoose
+
+**Authentication:** JWT, bcrypt
+
+**File Upload:** Multer
+
+## Run Locally
+
+### Backend
+
+```bash
+npm install
+CREATE A .env file with :
+CONNECTION_STRING
+SECRET_KEY
+node index.js || nodemon
+```
+
+### Frontend
+
+```bash
+npm install
+npm run dev
+```
+
+###  
+
+
+
+
+## Author
+
+**Abhay**
+**MERN & MEAN STACK DEVELOPR**
