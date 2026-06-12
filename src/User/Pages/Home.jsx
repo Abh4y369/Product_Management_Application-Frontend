@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from "react";
 import Header from "../Components/Header";
 import Sidebar from "../Components/Sidebar";
-import {FaHeart,FaRegHeart,FaStar,FaTimes,FaPlus,} from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaStar, FaTimes, FaPlus, } from "react-icons/fa";
+import {
+  getAllCategoriesApi, getAllProductsApi, getAllSubCategoriesApi,
+  addCategoryApi, addProductApi, addSubCategoryApi,
+  addWishlistApi, getWishlistApi
+} from "../../Services/allApis";
+import { useNavigate } from "react-router-dom";
+import baseUrl from "../../Services/baseUrl";
+import { toast } from "react-toastify";
 
 function Home() {
+
+  const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
@@ -14,62 +24,103 @@ function Home() {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showSubCategoryModal, setShowSubCategoryModal] = useState(false);
   const [showProductModal, setShowProductModal] = useState(false);
-
-  // CATEGORY
-  const [categoryName, setCategoryName] = useState("");
-
-  // SUBCATEGORY
-  const [subCategoryName, setSubCategoryName] = useState("");
+  const [user, setUser] = useState(null);                           //user
+  const [categoryName, setCategoryName] = useState("");             //category
+  const [subCategoryName, setSubCategoryName] = useState("");       //subCategory
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  // PRODUCT
+  // Product
   const [productData, setProductData] = useState({
     productName: "",
     description: "",
     image: "",
     subCategoryId: "",
-  });
+  })
+  const [variants, setVariants] = useState([{ ram: "", price: "", qty: "", }]);  //variants
+  const [preview, setPreview] = useState("");                                     //Image Upload
+  const [page, setPage] = useState(1);                                            //pagination
 
-  const [variants, setVariants] = useState([{ ram: "", price: "", qty: "",}]);
+
+
+  useEffect(() => {
+    const storedUser =
+      sessionStorage.getItem("user");
+    if (storedUser && storedUser !== "undefined") {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+
+  useEffect(() => {
+    getCategories();
+    getSubCategories();
+    const token =
+      sessionStorage.getItem("token");
+    if (token) {
+      getWishlist();
+    }
+  }, []);
+
 
   useEffect(() => {
     getProducts();
-    getCategories();
-    getSubCategories();
-  }, []);
+  }, [
+    searchTerm,
+    selectedSubCategory,
+    page
+  ]);
 
   const getProducts = async () => {
-    // API CALL
-  };
+    const res = await getAllProductsApi(searchTerm, selectedSubCategory, page);
+    if (res.status === 200) {
+      //console.log(res.data.allProducts);
+      setProducts(res.data.allProducts);
+    }
+  }
 
   const getCategories = async () => {
-    // API CALL
-  };
+    const res = await getAllCategoriesApi();
+    if (res.status === 200) {
+      setCategories(res.data);
+    }
+  }
 
   const getSubCategories = async () => {
-    // API CALL
+    const res = await getAllSubCategoriesApi();
+    if (res.status === 200) {
+      setSubCategories(res.data);
+    }
+  }
+
+  const getWishlist = async () => {
+    const res = await getWishlistApi();
+    if (res.status === 200) {
+      setWishlist(res.data);
+    }
+
   };
 
   // FILTER PRODUCTS
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.productName?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSubCategory = !selectedSubCategory || product.subCategoryId === selectedSubCategory;
+    const matchesSubCategory = !selectedSubCategory || product.subCategoryId === selectedSubCategory ||
+      product.subCategoryId?._id === selectedSubCategory;
     return matchesSearch && matchesSubCategory;
   });
 
-//WISHLISTS
-  const toggleWishlist = (product) => {
+  //Wishlist Toggle
+  const toggleWishlist = async (product) => {
     const exists = wishlist.find((item) => item._id === product._id);
-    if (exists) {
-      setWishlist(
-        wishlist.filter((item) => item._id !== product._id));
-    } else {
-      setWishlist([...wishlist, product]);
+    if (!exists) {
+      const res = await addWishlistApi(product._id);
+      if (res.status === 200) {
+        getWishlist();
+      }
     }
-  };
+  }
 
-  
-  // VARIANTS
+
+  // Variants
   const addVariant = () => {
     setVariants([...variants, { ram: "", price: "", qty: "", },]);
   };
@@ -80,21 +131,66 @@ function Home() {
     setVariants(copy);
   };
 
-  // SAVE FUNCTIONS
+  // Category
   const handleAddCategory = async () => {
-    console.log(categoryName);
+    if (!categoryName) {
+      toast.warning("Category name is required");
+      return;
+    }
+    const result = await addCategoryApi({ categoryName });
+    if (result.status === 200) {
+      getCategories();
+      setCategoryName("");
+      setShowCategoryModal(false);
+    }
   };
 
   const handleAddSubCategory = async () => {
-    console.log(
-      subCategoryName,
-      selectedCategory
-    );
+    if (!selectedCategory || !subCategoryName.trim()) {
+      toast.warning("Please fill all fields");
+      return;
+    }
+    const res = await addSubCategoryApi({ subCategoryName, categoryId: selectedCategory });
+    if (res.status === 200) {
+      getSubCategories();
+      setSubCategoryName("");
+      setSelectedCategory("");
+      setShowSubCategoryModal(false);
+    }
   };
 
+  //Add Product
+
   const handleAddProduct = async () => {
-    console.log(productData);
-    console.log(variants);
+    if (
+      !productData.productName ||
+      !productData.description ||
+      !productData.subCategoryId ||
+      !productData.image
+    ) {
+      toast.warning("Please fill all fields");
+      return;
+    }
+    const invalidVariant =
+      variants.some((item) =>!item.ram || !item.price || !item.qty);
+    if (invalidVariant) {
+      toast.warning("Fill all variant fields");
+      return;
+    }
+    const reqBody = new FormData();
+    reqBody.append("productName", productData.productName);
+    reqBody.append("description", productData.description);
+    reqBody.append("subCategoryId", productData.subCategoryId);
+    reqBody.append("image", productData.image);
+    reqBody.append("variants", JSON.stringify(variants));
+    const res = await addProductApi(reqBody);
+    if (res.status === 200) {
+      getProducts();
+      setProductData({ productName: "", description: "", image: "", subCategoryId: "", });
+      setVariants([{ ram: "", price: "", qty: "", },]);
+      setPreview("");
+      setShowProductModal(false);
+    }
   };
 
   return (
@@ -104,7 +200,11 @@ function Home() {
       <Header
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        wishlist={wishlist} />
+        wishlist={wishlist}
+        setWishlist={setWishlist}
+        user={user}
+        setUser={setUser}
+      />
 
       {/* Body */}
       <div className="max-w-7xl mx-auto px-8 py-8">
@@ -128,9 +228,12 @@ function Home() {
 
           {/* Sidebar */}
           <div className="w-64">
-            <Sidebar categories={categories}
+            <Sidebar
+              categories={categories}
+              subCategories={subCategories}
               selectedSubCategory={selectedSubCategory}
-              setSelectedSubCategory={setSelectedSubCategory} />
+              setSelectedSubCategory={setSelectedSubCategory}
+            />
           </div>
 
           {/* Products */}
@@ -143,15 +246,20 @@ function Home() {
                     onClick={() => navigate(`/product/${product._id}`)}
                     className="border rounded-2xl p-4 relative hover:shadow-md transition cursor-pointer">
 
-                    <button onClick={() => toggleWishlist(product)} className="absolute right-4 top-4">
+                    <button onClick={(e) => {
+                      e.stopPropagation();
+                      toggleWishlist(product);
+                    }} className="absolute right-4 top-4">
                       {isWishlisted ? (<FaHeart className="text-sky-300" />)
                         :
                         (<FaRegHeart className="text-sky-300" />)}
                     </button>
 
-                    <img src={product.image} alt="" className="w-full h-40 object-contain" />
+                    <img src={`${baseUrl}/uploads/${product.image}`}
+                      alt="" className="w-full h-40 object-contain" />
+
                     <h3 className="mt-4 text-[#003B5C] font-medium"> {product.productName}</h3>
-                    <p className="font-semibold mt-2">₹ {product.price}</p>
+                    <p className="font-semibold mt-2">₹ {product?.variants?.[0]?.price}</p>
                     {/* Stars */}
                     <div className="flex gap-1 mt-3 text-gray-300">
                       <FaStar />
@@ -162,16 +270,21 @@ function Home() {
                     </div>
 
                   </div>
-                );})}
+                );
+              })}
             </div>
 
             {/* PAGINATION */}
             <div className="flex justify-center mt-8 gap-3">
-              <button className="w-8 h-8 rounded-full bg-[#F5A623] text-white"> 1 </button>
-              <button>2</button>
-              <button>3</button>
-              <button>4</button>
-              <button>5</button>
+              <button onClick={() => setPage(1)}
+                className={`w-8 h-8 rounded-full ${page === 1 ? "bg-[#F5A623] text-white" : ""}`}>
+                1
+              </button>
+
+              <button onClick={() => setPage(2)}>2</button>
+              <button onClick={() => setPage(3)}>3</button>
+              <button onClick={() => setPage(4)}>4</button>
+              <button onClick={() => setPage(5)}>5</button>
             </div>
 
           </div>
@@ -214,7 +327,7 @@ function Home() {
               <option value="">Select Category</option>
               {categories.map((category) => (
                 <option key={category._id} value={category._id}>
-                  {category.name}
+                  {category.categoryName}
                 </option>
               ))}
             </select>
@@ -284,7 +397,7 @@ function Home() {
 
                 {subCategories.map((sub) => (
                   <option key={sub._id} value={sub._id}>
-                    {sub.name}
+                    {sub.subCategoryName}
                   </option>
 
                 ))}
@@ -305,9 +418,21 @@ function Home() {
               <label className="text-gray-500 text-lg"> Upload image: </label>
               <div className="flex gap-4">
                 <label className="w-24 h-24 border rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-50">
-                  <input type="file" hidden />
+                  <input type="file" hidden
+                    onChange={(e) => {
+                      setProductData({ ...productData, image: e.target.files[0] });
+                      setPreview(URL.createObjectURL(e.target.files[0]));
+                    }} />
                   <FaPlus className="text-gray-400" />
                 </label>
+
+                {preview && (
+                  <img
+                    src={preview}
+                    alt=""
+                    className="w-24 h-24 rounded-lg border object-cover"
+                  />
+                )}
               </div>
 
             </div>

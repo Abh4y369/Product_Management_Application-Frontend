@@ -52,7 +52,7 @@ const Authentication = () => {
                 const result = await signinApi({ email, password });
                 if (result.status === 200) {
                     sessionStorage.setItem("token", result.data.token);
-                    sessionStorage.setItem("user", result.data.user);
+                    sessionStorage.setItem("user",  JSON.stringify(result.data.user));
                     toast.success("Login Successful");
                     setUser({
                         name: "", email: "", password: ""
@@ -79,7 +79,6 @@ const Authentication = () => {
                     <>
                         {/* Left Side */}
                         <div className="w-full lg:w-2/3 bg-white flex flex-col justify-center items-center px-6 md:px-10 lg:px-12 py-12">
-
                             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#E6A112] text-center mb-10">
                                 Sign In to <br /> Your Account
                             </h1>

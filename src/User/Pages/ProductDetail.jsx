@@ -8,10 +8,12 @@ import {
   FaCheck,
   FaTimes,
 } from "react-icons/fa";
+import { getProductByIdApi, updateProductApi, addWishlistApi, getWishlistApi } from "../../Services/allApis";
+import baseUrl from "../../Services/baseUrl";
 import { useParams } from "react-router-dom";
 
 function ProductDetail() {
-  const { id } = useParams();
+  const { pid } = useParams();
 
   const [product, setProduct] = useState(null);
 
@@ -29,52 +31,145 @@ function ProductDetail() {
     subCategoryId: "",
   });
 
+  const [searchTerm, setSearchTerm] =
+    useState("");
+
+  const [wishlist, setWishlist] =
+    useState([]);
+
+  const [user, setUser] =
+    useState(null);
+
   // ---------------------
   // API CALL
   // ---------------------
 
   useEffect(() => {
-    getSingleProduct();
+    const storedUser =
+      sessionStorage.getItem("user");
+
+    if (
+      storedUser &&
+      storedUser !== "undefined"
+    ) {
+      setUser(JSON.parse(storedUser));
+    }
   }, []);
 
-  const getSingleProduct = async () => {
-    // API CALL
+  useEffect(() => {
+    getSingleProduct();
+  }, [pid]);
 
-    const dummy = {
-      _id: 1,
-      productName: "HP AMD Ryzen 3",
-      description:
-        "The Ryzen processor delivers excellent performance.",
-      image:
-        "https://pngimg.com/d/laptop_PNG5939.png",
-      variants: [
-        {
-          ram: "4 GB",
-          price: 52999,
-          qty: 10,
-        },
-        {
-          ram: "8 GB",
-          price: 62999,
-          qty: 8,
-        },
-        {
-          ram: "16 GB",
-          price: 72999,
-          qty: 5,
-        },
-      ],
+
+  useEffect(() => {
+
+    const token =
+      sessionStorage.getItem("token");
+
+    if (token) {
+      getWishlist();
+    }
+
+  }, []);
+
+
+  //get Single product
+
+  const getSingleProduct = async () => {
+
+    const result =
+      await getProductByIdApi(pid);
+
+    if (result.status === 200) {
+
+      const data = result.data;
+
+      setProduct(data);
+
+      setSelectedVariant(
+        data.variants[0]
+      );
+
+      setEditData({
+        productName:
+          data.productName,
+        description:
+          data.description,
+        subCategoryId:
+          data.subCategoryId,
+      });
+    }
+  };
+
+  //wishlist loader
+  const getWishlist = async () => {
+
+    const result =
+      await getWishlistApi();
+
+    if (result.status === 200) {
+      setWishlist(result.data);
+    }
+
+  };
+
+
+  //Update Product
+  const handleUpdateProduct =
+    async () => {
+
+      if (
+        !editData.productName ||
+        !editData.description
+      ) {
+        alert(
+          "Please fill all fields"
+        );
+        return;
+      }
+
+      const reqBody =
+        new FormData();
+
+      reqBody.append(
+        "productName",
+        editData.productName
+      );
+
+      reqBody.append(
+        "description",
+        editData.description
+      );
+
+      reqBody.append(
+        "subCategoryId",
+        editData.subCategoryId
+      );
+
+      const result =
+        await updateProductApi(
+          pid,
+          reqBody
+        );
+
+      if (result.status === 200) {
+
+        getSingleProduct();
+
+        setShowEditModal(
+          false
+        );
+
+        alert(
+          "Product Updated Successfully"
+        );
+
+      }
+
     };
 
-    setProduct(dummy);
 
-    setSelectedVariant(dummy.variants[0]);
 
-    setEditData({
-      productName: dummy.productName,
-      description: dummy.description,
-    });
-  };
 
   if (!product) {
     return (
@@ -87,7 +182,14 @@ function ProductDetail() {
   return (
     <div>
 
-      <Header />
+      <Header
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        wishlist={wishlist}
+        setWishlist={setWishlist}
+        user={user}
+        setUser={setUser}
+      />
 
       <div className="max-w-7xl mx-auto px-8 py-10">
 
@@ -110,7 +212,7 @@ function ProductDetail() {
             <div className="border rounded-2xl h-[420px] flex justify-center items-center">
 
               <img
-                src={product.image}
+                src={`${baseUrl}/uploads/${product.image}`}
                 alt=""
                 className="w-[300px]"
               />
@@ -123,7 +225,7 @@ function ProductDetail() {
 
               <div className="border rounded-xl p-3">
                 <img
-                  src={product.image}
+                  src={`${baseUrl}/uploads/${product.image}`}
                   alt=""
                   className="w-24"
                 />
@@ -131,7 +233,7 @@ function ProductDetail() {
 
               <div className="border rounded-xl p-3">
                 <img
-                  src={product.image}
+                  src={`${baseUrl}/uploads/${product.image}`}
                   alt=""
                   className="w-24"
                 />
@@ -162,13 +264,17 @@ function ProductDetail() {
               <FaCheck className="text-green-500" />
 
               <span className="text-green-500">
-                In stock
+                {selectedVariant?.qty > 0
+                  ? "In Stock"
+                  : "Out Of Stock"}
               </span>
 
             </div>
 
             <p className="text-gray-500 mt-2">
-              Hurry up! only few products left
+              Only {
+                selectedVariant?.qty
+              } items left in stock
             </p>
 
             <hr className="my-8" />
@@ -193,12 +299,11 @@ function ProductDetail() {
                         )
                       }
                       className={`px-4 py-2 border rounded
-                      ${
-                        selectedVariant?.ram ===
-                        variant.ram
+                      ${selectedVariant?.ram ===
+                          variant.ram
                           ? "bg-[#F5A623] text-white"
                           : ""
-                      }`}
+                        }`}
                     >
                       {variant.ram}
                     </button>
@@ -267,7 +372,27 @@ function ProductDetail() {
                 Buy it now
               </button>
 
-              <button className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
+              <button
+                onClick={async () => {
+
+                  const result =
+                    await addWishlistApi(
+                      product._id
+                    );
+
+                  if (result.status === 200) {
+
+                    getWishlist();
+
+                    alert(
+                      "Added to Wishlist"
+                    );
+
+                  }
+
+                }}
+                className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center"
+              >
                 <FaHeart />
               </button>
 
@@ -330,6 +455,7 @@ function ProductDetail() {
             <div className="flex justify-end mt-6">
 
               <button
+                onClick={handleUpdateProduct}
                 className="bg-[#F5A623] text-white px-6 py-3 rounded-lg"
               >
                 Update Product

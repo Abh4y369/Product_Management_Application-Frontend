@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import baseUrl from "../../Services/baseUrl";
+import { getWishlistApi, deleteWishlistApi } from "../../Services/allApis";
 import {
   FaHeart,
-  FaUserCircle,
   FaSearch,
-  FaSignOutAlt,
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -11,17 +11,38 @@ function Header({
   searchTerm,
   setSearchTerm,
   wishlist = [],
+  setWishlist,
   user,
   setUser,
 }) {
   const navigate = useNavigate();
 
   const [showWishlist, setShowWishlist] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem("token")) {
+      getWishlist();
+    }
+  }, []);
+
+  //wishlists display
+  const getWishlist = async () => {
+    const result = await getWishlistApi();
+    if (result.status === 200) {
+      setWishlist(result.data);
+    }
+  }
+
+  const handleRemove = async (pid) => {
+    const result = await deleteWishlistApi(pid);
+    if (result.status === 200) {
+      setWishlist(wishlist.filter((item) => item._id !== pid));
+    }
+  }
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
 
     if (setUser) {
       setUser(null);
@@ -81,39 +102,21 @@ function Header({
               Sign In
             </Link>
           ) : (
-            <div className="relative">
+            <div className="flex items-center gap-4">
+
+              <span className="text-sm font-medium">
+                Hi, Welcome {user?.name}
+              </span>
 
               <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center gap-2"
+                onClick={handleLogout}
+                className="bg-[#F5A623] hover:bg-[#e29516] px-4 py-2 rounded-lg text-sm font-medium transition"
               >
-                <FaUserCircle size={28} />
+                Logout
               </button>
 
-              {showDropdown && (
-                <div className="absolute right-0 mt-3 w-52 bg-white rounded-lg shadow-lg text-black z-50">
-
-                  <div className="px-4 py-3 border-b">
-                    <p className="font-semibold">
-                      {user?.name || "User"}
-                    </p>
-
-                    <p className="text-xs text-gray-500">
-                      {user?.email}
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-4 py-3 hover:bg-gray-100"
-                  >
-                    <FaSignOutAlt />
-                    Logout
-                  </button>
-
-                </div>
-              )}
             </div>
+
           )}
         </div>
       </header>
@@ -154,7 +157,7 @@ function Header({
                     className="border rounded-lg p-3 mb-3"
                   >
                     <img
-                      src={item.image}
+                      src={`${baseUrl}/uploads/${item.image}`}
                       alt={item.productName}
                       className="w-full h-32 object-contain"
                     />
@@ -164,8 +167,17 @@ function Header({
                     </h3>
 
                     <p className="text-sm text-gray-600">
-                      ₹{item.price}
+                      ₹{item?.variants?.[0]?.price}
                     </p>
+
+                    <button
+                      onClick={() =>
+                        handleRemove(item._id)
+                      }
+                      className="mt-3 w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg text-sm"
+                    >
+                      Remove
+                    </button>
                   </div>
                 ))
               )}
