@@ -76,7 +76,7 @@ function ProductDetail() {
   //get Single product
 
   const getSingleProduct = async () => {
-
+    console.log(editData);
     const result =
       await getProductByIdApi(pid);
 
@@ -91,12 +91,9 @@ function ProductDetail() {
       );
 
       setEditData({
-        productName:
-          data.productName,
-        description:
-          data.description,
-        subCategoryId:
-          data.subCategoryId,
+        productName: data.productName,
+        description: data.description,
+        subCategoryId: data.subCategoryId?._id,
       });
     }
   };
@@ -146,6 +143,7 @@ function ProductDetail() {
         editData.subCategoryId
       );
 
+
       const result =
         await updateProductApi(
           pid,
@@ -153,7 +151,7 @@ function ProductDetail() {
         );
 
       if (result.status === 200) {
-
+        console.log(editData);
         getSingleProduct();
 
         setShowEditModal(
