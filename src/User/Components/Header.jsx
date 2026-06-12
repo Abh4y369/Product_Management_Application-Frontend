@@ -56,10 +56,10 @@ function Header({
   return (
     <>
       {/* HEADER */}
-      <header className="bg-[#003B5C] h-20 flex items-center justify-center relative px-4">
+      <header className="bg-[#003B5C] min-h-[5rem] py-4 md:py-0 md:h-20 flex flex-col md:flex-row items-center justify-center relative px-4 gap-4 md:gap-0">
 
         {/* SEARCH BAR */}
-        <div className="flex w-full max-w-xl">
+        <div className="flex w-full max-w-xl order-2 md:order-none">
 
           <div className="flex items-center bg-white rounded-l-full px-4 w-full">
             <FaSearch className="text-gray-400 mr-2" />
@@ -73,13 +73,13 @@ function Header({
             />
           </div>
 
-          <button className="bg-[#F5A623] hover:bg-[#e29516] text-white px-8 rounded-r-full font-medium transition">
+          <button className="bg-[#F5A623] hover:bg-[#e29516] text-white px-6 md:px-8 rounded-r-full font-medium transition">
             Search
           </button>
         </div>
 
         {/* RIGHT SECTION */}
-        <div className="absolute right-8 flex items-center gap-6 text-white">
+        <div className="flex md:absolute right-4 md:right-8 items-center justify-end w-full md:w-auto gap-4 md:gap-6 text-white order-1 md:order-none">
 
           {/* WISHLIST */}
           <button

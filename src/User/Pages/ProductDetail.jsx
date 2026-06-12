@@ -15,9 +15,9 @@ import { useParams } from "react-router-dom";
 function ProductDetail() {
   const { pid } = useParams();
   const [product, setProduct] = useState(null);
-  const [selectedVariant, setSelectedVariant] =useState(null);
+  const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [showEditModal, setShowEditModal] =useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [editData, setEditData] = useState({
     productName: "",
     description: "",
@@ -31,9 +31,9 @@ function ProductDetail() {
   const [user, setUser] =
     useState(null);
 
-  
+
   // API CALL
-  
+
 
   useEffect(() => {
     const storedUser =
@@ -100,71 +100,71 @@ function ProductDetail() {
 
   //Update Product
   const handleUpdateProduct = async () => {
-      if ( !editData.productName || !editData.description
-      ) {
-        alert(
-          "Please fill all fields"
-        );
-        return;
-      }
+    if (!editData.productName || !editData.description
+    ) {
+      alert(
+        "Please fill all fields"
+      );
+      return;
+    }
 
-      const token = sessionStorage.getItem("token");
-      if (!token) {
-        alert("Please login first");
-        return;
-      }
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      alert("Please login first");
+      return;
+    }
 
-      const reqBody =
-        new FormData();
+    const reqBody =
+      new FormData();
 
-      reqBody.append(
-        "productName",
-        editData.productName
+    reqBody.append(
+      "productName",
+      editData.productName
+    );
+
+    reqBody.append(
+      "description",
+      editData.description
+    );
+
+    reqBody.append(
+      "subCategoryId",
+      editData.subCategoryId
+    );
+
+    // Preserve existing image and variants
+    reqBody.append(
+      "image",
+      product.image
+    );
+
+    reqBody.append(
+      "variants",
+      JSON.stringify(product.variants)
+    );
+
+
+    const result =
+      await updateProductApi(
+        pid,
+        reqBody
       );
 
-      reqBody.append(
-        "description",
-        editData.description
+    if (result.status === 200) {
+      console.log(editData);
+      getSingleProduct();
+
+      setShowEditModal(
+        false
       );
 
-      reqBody.append(
-        "subCategoryId",
-        editData.subCategoryId
+      alert(
+        "Product Updated Successfully"
       );
 
-      // Preserve existing image and variants
-      reqBody.append(
-        "image",
-        product.image
-      );
+    }
 
-      reqBody.append(
-        "variants",
-        JSON.stringify(product.variants)
-      );
-
-
-      const result =
-        await updateProductApi(
-          pid,
-          reqBody
-        );
-
-      if (result.status === 200) {
-        console.log(editData);
-        getSingleProduct();
-
-        setShowEditModal(
-          false
-        );
-
-        alert(
-          "Product Updated Successfully"
-        );
-
-      }
-
-    };
+  };
 
 
 
@@ -189,11 +189,11 @@ function ProductDetail() {
         setUser={setUser}
       />
 
-      <div className="max-w-7xl mx-auto px-8 py-10">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-10">
 
         {/* Breadcrumb */}
 
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-10">
+        <div className="flex items-center gap-2 text-sm text-gray-500 mb-8 md:mb-10">
           <span>Home</span>
           <span>{">"}</span>
           <span>Product Details</span>
@@ -201,25 +201,25 @@ function ProductDetail() {
 
         {/* Content */}
 
-        <div className="grid grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
 
           {/* LEFT */}
 
           <div>
 
-            <div className="border rounded-2xl h-[420px] flex justify-center items-center">
+            <div className="border rounded-2xl h-80 md:h-[420px] flex justify-center items-center p-4">
 
               <img
                 src={`${baseUrl}/uploads/${product.image}`}
                 alt=""
-                className="w-[300px]"
+                className="w-full max-w-[300px] max-h-full object-contain"
               />
 
             </div>
 
             {/* Thumbnails */}
 
-            <div className="flex gap-4 mt-5">
+            <div className="flex flex-wrap gap-4 mt-5">
 
               <div className="border rounded-xl p-3">
                 <img
@@ -285,7 +285,7 @@ function ProductDetail() {
                 Ram:
               </h3>
 
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
 
                 {product.variants.map(
                   (variant, index) => (
@@ -351,19 +351,19 @@ function ProductDetail() {
 
             {/* Buttons */}
 
-            <div className="flex gap-5 mt-10">
+            <div className="flex flex-wrap gap-3 md:gap-5 mt-8 md:mt-10">
 
               <button
                 onClick={() =>
                   setShowEditModal(true)
                 }
-                className="bg-[#F5A623] text-white px-8 py-3 rounded-full"
+                className="bg-[#F5A623] text-white px-6 md:px-8 py-3 rounded-full w-full sm:w-auto text-sm md:text-base font-medium"
               >
                 Edit Product
               </button>
 
               <button
-                className="bg-[#F5A623] text-white px-8 py-3 rounded-full"
+                className="bg-[#F5A623] text-white px-6 md:px-8 py-3 rounded-full w-full sm:w-auto text-sm md:text-base font-medium"
               >
                 Buy it now
               </button>
@@ -410,9 +410,9 @@ function ProductDetail() {
       {/* EDIT PRODUCT MODAL */}
 
       {showEditModal && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
 
-          <div className="bg-white w-[700px] rounded-xl p-8">
+          <div className="bg-white w-full max-w-[700px] rounded-xl p-6 md:p-8">
 
             <div className="flex justify-between mb-6">
 

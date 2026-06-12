@@ -230,27 +230,27 @@ function Home() {
       />
 
       {/* Body */}
-      <div className="max-w-7xl mx-auto px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 md:py-8">
         <div className="mb-6 text-sm"> Home </div>
 
         {/* Buttons */}
-        <div className="flex justify-end gap-4 mb-10">
-          <button onClick={() => setShowCategoryModal(true)} className="bg-[#F5A623] text-white px-5 py-3 rounded-xl text-sm">
+        <div className="flex flex-wrap justify-end gap-2 sm:gap-4 mb-6 md:mb-10">
+          <button onClick={() => setShowCategoryModal(true)} className="bg-[#F5A623] text-white px-4 md:px-5 py-2 md:py-3 rounded-xl text-sm w-full sm:w-auto">
             Add category
           </button>
-          <button onClick={() => setShowSubCategoryModal(true)} className="bg-[#F5A623] text-white px-5 py-3 rounded-xl text-sm">
+          <button onClick={() => setShowSubCategoryModal(true)} className="bg-[#F5A623] text-white px-4 md:px-5 py-2 md:py-3 rounded-xl text-sm w-full sm:w-auto">
             Add sub category
           </button>
-          <button onClick={() => setShowProductModal(true)} className="bg-[#F5A623] text-white px-5 py-3 rounded-xl text-sm">
+          <button onClick={() => setShowProductModal(true)} className="bg-[#F5A623] text-white px-4 md:px-5 py-2 md:py-3 rounded-xl text-sm w-full sm:w-auto">
             Add product
           </button>
         </div>
 
         {/* Main */}
-        <div className="flex gap-12">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-12">
 
           {/* Sidebar */}
-          <div className="w-64">
+          <div className="w-full md:w-64">
             <Sidebar
               categories={categories}
               subCategories={subCategories}
@@ -317,8 +317,8 @@ function Home() {
       {/* Category Modal */}
 
       {showCategoryModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-[450px]">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-[450px]">
             <div className="flex justify-between mb-5">
               <h2 className="font-semibold text-xl"> Add Category </h2>
               <FaTimes className="cursor-pointer" onClick={() => setShowCategoryModal(false)} />
@@ -339,8 +339,8 @@ function Home() {
       {/* SubCategory Modal */}
 
       {showSubCategoryModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-[500px]">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-[500px]">
             <div className="flex justify-between mb-5">
               <h2 className="font-semibold text-xl"> Add Sub Category </h2>
               <FaTimes className="cursor-pointer" onClick={() => setShowSubCategoryModal(false)} />
@@ -366,13 +366,13 @@ function Home() {
       {/* Product Modal */}
 
       {showProductModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white w-[800px] rounded-2xl px-10 py-8">
-            <h2 className="text-center text-3xl font-medium mb-10"> Add Product </h2>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-[800px] max-h-[90vh] overflow-y-auto rounded-2xl px-4 md:px-10 py-6 md:py-8">
+            <h2 className="text-center text-3xl font-medium mb-8 md:mb-10"> Add Product </h2>
 
             {/* Title */}
 
-            <div className="grid grid-cols-[150px_1fr] items-center mb-6">
+            <div className="flex flex-col sm:grid sm:grid-cols-[150px_1fr] sm:items-center mb-6 gap-2 sm:gap-0">
               <label className="text-gray-500 text-lg"> Title : </label>
               <input type="text" placeholder="HP AMD Ryzen 3" value={productData.productName}
                 onChange={(e) => setProductData({ ...productData, productName: e.target.value, })} className="border rounded-lg px-4 py-3" />
@@ -380,23 +380,23 @@ function Home() {
 
             {/* Variants */}
 
-            <div className="grid grid-cols-[150px_1fr] mb-6">
+            <div className="flex flex-col sm:grid sm:grid-cols-[150px_1fr] mb-6 gap-2 sm:gap-0">
               <label className="text-gray-500 text-lg pt-3">Variants :</label>
               <div>
                 {variants.map((variant, index) => (
-                  <div key={index} className="flex gap-3 items-center mb-3">
+                  <div key={index} className="flex flex-wrap gap-2 md:gap-3 items-center mb-3">
 
                     <span className="text-gray-400"> Ram: </span>
                     <input type="text" placeholder="4 GB" value={variant.ram} onChange={(e) => updateVariant(index, "ram", e.target.value)}
-                      className="border rounded-lg px-3 py-2 w-24" />
+                      className="border rounded-lg px-3 py-2 w-20 md:w-24" />
 
                     <span className="text-gray-400"> Price:</span>
                     <input type="number" placeholder="$529" value={variant.price} onChange={(e) => updateVariant(index, "price", e.target.value)}
-                      className="border rounded-lg px-3 py-2 w-28" />
+                      className="border rounded-lg px-3 py-2 w-24 md:w-28" />
 
                     <span className="text-gray-400"> QTY </span>
                     <input type="number" placeholder="1" value={variant.qty} onChange={(e) => updateVariant(index, "qty", e.target.value)}
-                      className="border rounded-lg px-3 py-2 w-24" />
+                      className="border rounded-lg px-3 py-2 w-20 md:w-24" />
 
                   </div>
                 ))}
@@ -410,7 +410,7 @@ function Home() {
 
             {/* SubCategory */}
 
-            <div className="grid grid-cols-[150px_1fr] items-center mb-6">
+            <div className="flex flex-col sm:grid sm:grid-cols-[150px_1fr] sm:items-center mb-6 gap-2 sm:gap-0">
 
               <label className="text-gray-500 text-lg"> Sub category : </label>
               <select value={productData.subCategoryId} onChange={(e) => setProductData({ ...productData, subCategoryId: e.target.value, })}
@@ -429,7 +429,7 @@ function Home() {
 
             {/* Description */}
 
-            <div className="grid grid-cols-[150px_1fr] items-center mb-6">
+            <div className="flex flex-col sm:grid sm:grid-cols-[150px_1fr] sm:items-center mb-6 gap-2 sm:gap-0">
               <label className="text-gray-500 text-lg"> Description : </label>
               <textarea rows="2" value={productData.description} onChange={(e) => setProductData({ ...productData, description: e.target.value, })}
                 className="border rounded-lg px-4 py-3" />
@@ -437,7 +437,7 @@ function Home() {
 
             {/* Image */}
 
-            <div className="grid grid-cols-[150px_1fr] items-center mb-8">
+            <div className="flex flex-col sm:grid sm:grid-cols-[150px_1fr] sm:items-center mb-8 gap-2 sm:gap-0">
               <label className="text-gray-500 text-lg"> Upload image: </label>
               <div className="flex gap-4">
                 <label className="w-24 h-24 border rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-50">
