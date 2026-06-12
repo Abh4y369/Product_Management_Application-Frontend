@@ -325,9 +325,8 @@ function ProductDetail() {
                 <button
                   onClick={() =>
                     quantity > 1 &&
-                    setQuantity(
-                      quantity - 1
-                    )
+                    selectedVariant?.qty > quantity &&
+                    setQuantity(quantity + 1)
                   }
                   className="px-3 py-2"
                 >
@@ -374,6 +373,13 @@ function ProductDetail() {
 
               <button
                 onClick={async () => {
+                  const token =
+                    sessionStorage.getItem("token");
+
+                  if (!token) {
+                    alert("Please login first");
+                    return;
+                  }
 
                   const result =
                     await addWishlistApi(

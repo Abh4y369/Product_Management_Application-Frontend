@@ -139,6 +139,7 @@ function Home() {
     }
     const result = await addCategoryApi({ categoryName });
     if (result.status === 200) {
+      toast.success("Category Added Successfully");
       getCategories();
       setCategoryName("");
       setShowCategoryModal(false);
@@ -152,6 +153,7 @@ function Home() {
     }
     const res = await addSubCategoryApi({ subCategoryName, categoryId: selectedCategory });
     if (res.status === 200) {
+      toast.success("Sub Category Added Successfully");
       getSubCategories();
       setSubCategoryName("");
       setSelectedCategory("");
@@ -172,7 +174,7 @@ function Home() {
       return;
     }
     const invalidVariant =
-      variants.some((item) =>!item.ram || !item.price || !item.qty);
+      variants.some((item) => !item.ram || !item.price || !item.qty);
     if (invalidVariant) {
       toast.warning("Fill all variant fields");
       return;
@@ -187,6 +189,7 @@ function Home() {
     if (res.status === 200) {
       getProducts();
       setProductData({ productName: "", description: "", image: "", subCategoryId: "", });
+      toast.success("Product Added Successfully");
       setVariants([{ ram: "", price: "", qty: "", },]);
       setPreview("");
       setShowProductModal(false);
