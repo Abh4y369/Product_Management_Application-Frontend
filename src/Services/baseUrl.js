@@ -1,3 +1,3 @@
-const baseUrl="http://localhost:3000"
+const baseUrl="https://product-management-app-backend.onrender.com"
 
 export default baseUrl
