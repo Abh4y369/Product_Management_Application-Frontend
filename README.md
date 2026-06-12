@@ -52,4 +52,4 @@ npm run dev
 ## Author
 
 **Abhay**
-**MERN & MEAN STACK DEVELOPR**
+**MERN & MEAN STACK DEVELOPER**
