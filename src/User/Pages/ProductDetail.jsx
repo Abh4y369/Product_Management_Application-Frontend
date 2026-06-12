@@ -14,17 +14,10 @@ import { useParams } from "react-router-dom";
 
 function ProductDetail() {
   const { pid } = useParams();
-
   const [product, setProduct] = useState(null);
-
-  const [selectedVariant, setSelectedVariant] =
-    useState(null);
-
+  const [selectedVariant, setSelectedVariant] =useState(null);
   const [quantity, setQuantity] = useState(1);
-
-  const [showEditModal, setShowEditModal] =
-    useState(false);
-
+  const [showEditModal, setShowEditModal] =useState(false);
   const [editData, setEditData] = useState({
     productName: "",
     description: "",
@@ -33,21 +26,18 @@ function ProductDetail() {
 
   const [searchTerm, setSearchTerm] =
     useState("");
-
   const [wishlist, setWishlist] =
     useState([]);
-
   const [user, setUser] =
     useState(null);
 
-  // ---------------------
+  
   // API CALL
-  // ---------------------
+  
 
   useEffect(() => {
     const storedUser =
       sessionStorage.getItem("user");
-
     if (
       storedUser &&
       storedUser !== "undefined"
@@ -100,10 +90,7 @@ function ProductDetail() {
 
   //wishlist loader
   const getWishlist = async () => {
-
-    const result =
-      await getWishlistApi();
-
+    const result = await getWishlistApi();
     if (result.status === 200) {
       setWishlist(result.data);
     }
@@ -112,12 +99,8 @@ function ProductDetail() {
 
 
   //Update Product
-  const handleUpdateProduct =
-    async () => {
-
-      if (
-        !editData.productName ||
-        !editData.description
+  const handleUpdateProduct = async () => {
+      if ( !editData.productName || !editData.description
       ) {
         alert(
           "Please fill all fields"
