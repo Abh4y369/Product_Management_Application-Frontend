@@ -93,7 +93,7 @@ function ProductDetail() {
       setEditData({
         productName: data.productName,
         description: data.description,
-        subCategoryId: data.subCategoryId?._id,
+        subCategoryId: data.subCategoryId?._id || data.subCategoryId,
       });
     }
   };
@@ -125,6 +125,12 @@ function ProductDetail() {
         return;
       }
 
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        alert("Please login first");
+        return;
+      }
+
       const reqBody =
         new FormData();
 
@@ -141,6 +147,17 @@ function ProductDetail() {
       reqBody.append(
         "subCategoryId",
         editData.subCategoryId
+      );
+
+      // Preserve existing image and variants
+      reqBody.append(
+        "image",
+        product.image
+      );
+
+      reqBody.append(
+        "variants",
+        JSON.stringify(product.variants)
       );
 
 
@@ -323,8 +340,7 @@ function ProductDetail() {
                 <button
                   onClick={() =>
                     quantity > 1 &&
-                    selectedVariant?.qty > quantity &&
-                    setQuantity(quantity + 1)
+                    setQuantity(quantity - 1)
                   }
                   className="px-3 py-2"
                 >

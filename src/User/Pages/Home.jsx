@@ -110,6 +110,11 @@ function Home() {
 
   //Wishlist Toggle
   const toggleWishlist = async (product) => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      toast.warning("Please login first");
+      return;
+    }
     const exists = wishlist.find((item) => item._id === product._id);
     if (!exists) {
       const res = await addWishlistApi(product._id);
@@ -133,6 +138,11 @@ function Home() {
 
   // Category
   const handleAddCategory = async () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      toast.warning("Please login first");
+      return;
+    }
     if (!categoryName) {
       toast.warning("Category name is required");
       return;
@@ -147,6 +157,11 @@ function Home() {
   };
 
   const handleAddSubCategory = async () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      toast.warning("Please login first");
+      return;
+    }
     if (!selectedCategory || !subCategoryName.trim()) {
       toast.warning("Please fill all fields");
       return;
@@ -164,6 +179,11 @@ function Home() {
   //Add Product
 
   const handleAddProduct = async () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      toast.warning("Please login first");
+      return;
+    }
     if (
       !productData.productName ||
       !productData.description ||

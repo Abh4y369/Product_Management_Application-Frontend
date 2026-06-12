@@ -6,6 +6,7 @@ import {
   FaSearch,
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Header({
   searchTerm,
@@ -43,6 +44,7 @@ function Header({
   const handleLogout = () => {
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("user");
+    toast.error('Logged Out')
 
     if (setUser) {
       setUser(null);
